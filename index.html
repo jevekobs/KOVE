@@ -309,7 +309,7 @@
                 </div>
 
                 <div class="bg-[#222831] p-8 md:p-10 rounded-2xl shadow-2xl border border-gray-700">
-                    <form action="https://formspree.io/f/mykdkjzq" method="POST" class="space-y-5">
+                    <form method="POST" class="space-y-5" id = "form">
                         
                         <div>
                             <label class="block text-gray-400 text-sm mb-2" for="name">Nombre Completo</label>
@@ -357,6 +357,7 @@
                             class="w-full bg-[#00ADB5] text-white font-bold py-4 rounded-lg hover:bg-[#00fff5] hover:text-[#222831] transition-all transform hover:scale-[1.02]">
                             Enviar Mensaje
                         </button>
+                        <div id="result" class="mt-4 text-center font-bold"></div>
                     </form>
                 </div>
 
@@ -367,6 +368,55 @@
     <footer class="py-10 text-center text-gray-400 text-sm">
         <p>&copy; 2026 KOVE ASESORES SpA. Todos los derechos reservados. Chile.</p>
     </footer>
+
+<script>
+        const form = document.getElementById('form');
+        const result = document.getElementById('result');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            // Tu clave ya está integrada aquí
+            formData.append("access_key", "24eb56ac-cc5a-4600-801b-c8d8e7f34b8c");
+
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = "Enviando...";
+            submitBtn.disabled = true;
+            result.className = "mt-4 text-center font-bold text-gray-400";
+            result.textContent = "Procesando envío...";
+
+            try {
+                const response = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    result.className = "mt-4 text-center font-bold text-[#00ADB5]";
+                    result.textContent = "¡Éxito! Tu mensaje ha sido enviado correctamente.";
+                    form.reset();
+                } else {
+                    result.className = "mt-4 text-center font-bold text-red-500";
+                    result.textContent = "Error: " + data.message;
+                }
+
+            } catch (error) {
+                result.className = "mt-4 text-center font-bold text-red-500";
+                result.textContent = "Algo salió mal. Por favor, intenta de nuevo.";
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                // Limpiar el mensaje después de 5 segundos
+                setTimeout(() => { result.textContent = ""; }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
 
 </body>
 </html>
